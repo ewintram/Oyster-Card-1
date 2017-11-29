@@ -19,7 +19,7 @@ describe Oystercard do
     end
 
     it "initializes with an empty array of journeys" do
-      expect(oystercard.journeys).to eq []
+      expect(oystercard.journey_history).to eq []
     end
 
   end
@@ -45,16 +45,17 @@ describe Oystercard do
 
   describe "#touch_in" do
 
-      context "with top-up" do
+    it "should raise error if card hasnt been touched out" do
+      expect { oystercard.touch_in(station) }.to raise_error "card already in use"
+    end
 
-        it "should be in_journey when touched in" do
-          expect(oystercard).to be_in_journey
-        end
+    it "should be in_journey when touched in" do
+      expect(oystercard).to be_in_journey
+    end
 
-        it "stores the start station in instance variable" do
-          expect(oystercard.entry_station).to eq(station)
-        end
-      end
+    it "stores the start station in instance variable" do
+      expect(oystercard.entry_station).to eq(station)
+    end
 
     it "raises an error when attempting to touch in with balance of < £#{Oystercard::DEFAULT_MINIMUM}", :skip_before do
       expect {oystercard.touch_in(station) }.to raise_error "Insufficient balance for journey"
@@ -66,8 +67,6 @@ describe Oystercard do
   describe "#touch_out" do
 
     before do
-      oystercard.top_up(10)
-      oystercard.touch_in(station)
       oystercard.touch_out(station)
     end
      it "should not be in_journey when touched out" do
@@ -78,6 +77,8 @@ describe Oystercard do
        expect { oystercard.touch_out(station) }.to change{ oystercard.balance }.by(-Oystercard::DEFAULT_MINIMUM)
      end
 
+
+
      it "removes the entry station from the instance variable" do
        expect(oystercard.entry_station).to eq nil
      end
@@ -85,24 +86,13 @@ describe Oystercard do
      it "stores the exit station in an instance variable" do
        expect(oystercard.exit_station).to eq(station)
      end
+
+     it "pushes the journey hash into the journeys array" do
+       expect(oystercard.journey_history).to include({:entry_station => station, :exit_station => station})
+     end
   end
 
-  describe "#record_journey" do
 
-    before do
-      oystercard.top_up(10)
-      oystercard.touch_in(station)
-      oystercard.touch_out(station)
-    end
-    it "adds the exit station to a journey hash" do
-      expect(oystercard.journey).to include(:entry_station => station, :exit_station => station)
-    end
-
-    it "pushes the journey has into the journeys array" do
-      expect(oystercard.journeys).to include(oystercard.journey)
-    end
-
-  end
 
 
 end
