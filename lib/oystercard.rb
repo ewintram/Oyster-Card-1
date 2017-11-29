@@ -6,6 +6,7 @@ class Oystercard
 
   DEFAULT_LIMIT = 90
   DEFAULT_MINIMUM = 1
+  PENALTY = 6
 
   def initialize
     @balance = 0
@@ -23,14 +24,14 @@ class Oystercard
   end
 
   def touch_in(entry_station)
-    raise "card already in use" if in_journey?
+    double_touch
     raise "Insufficient balance for journey" if @balance < 1
     @entry_station = entry_station
     @journey = Journey.new(@entry_station)
   end
 
   def touch_out(exit_station)
-    deduct(DEFAULT_MINIMUM)
+    deduct
     @exit_station = exit_station
     update_journey_history
     @entry_station = nil
@@ -43,8 +44,14 @@ class Oystercard
     @journey_history << @journey.record_journey
   end
 
-  def deduct(money)
-    @balance -= money
+  def deduct
+    @balance -= @journey.fare
   end
 
+  def double_touch
+    if !@entry_station.nil?
+      update_journey_history
+      deduct
+    end
+  end
 end

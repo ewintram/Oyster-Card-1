@@ -45,8 +45,19 @@ describe Oystercard do
 
   describe "#touch_in" do
 
-    it "should raise error if card hasnt been touched out" do
-      expect { oystercard.touch_in(station) }.to raise_error "card already in use"
+    it "should complete an unfinished journey by setting exit station to nil" do
+      # oystercard.touch_in(station)
+      expect(oystercard.exit_station).to eq nil
+    end
+
+    it "should return entry station and nil in the journeys array" do
+      # oystercard.touch_in(station)
+      expect(oystercard.journey_history).to include({:entry_station => station, :exit_station => nil})
+    end
+
+    it "should charge a penalty fare if the card hasnt been touched out" do
+      oystercard.top_up(10)
+      expect { oystercard.touch_in(station) }.to change {oystercard.balance}.by -Oystercard::PENALTY
     end
 
     it "should be in_journey when touched in" do

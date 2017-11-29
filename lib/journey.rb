@@ -9,8 +9,13 @@ class Journey
   def end_journey(exit_station)
     @exit_station = exit_station
   end
+
   def record_journey
     @journey = {:entry_station => @entry_station, :exit_station => @exit_station}
+  end
+
+  def fare
+    @exit_station.nil? ? Oystercard::PENALTY : Oystercard::DEFAULT_MINIMUM 
   end
 
 end

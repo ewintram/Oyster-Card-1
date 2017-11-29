@@ -30,6 +30,19 @@ describe Journey do
     end
   end
 
-  
+  describe "#fare" do
+    it "calculates the fare" do
+      journey.end_journey("Hoxton")
+      expect(journey.fare).to eq Oystercard::DEFAULT_MINIMUM
+    end
+
+    it "calculates the fare" do
+      journey.end_journey(nil)
+      expect(journey.fare).to eq Oystercard::PENALTY
+    end
+
+  end
+
+
   end
 end
