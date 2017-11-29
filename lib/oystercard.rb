@@ -31,8 +31,8 @@ class Oystercard
   end
 
   def touch_out(exit_station)
-    deduct
     @exit_station = exit_station
+    deduct
     update_journey_history
     @entry_station = nil
   end

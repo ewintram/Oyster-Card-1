@@ -7,10 +7,6 @@ describe Journey do
   let(:oystercard) { double(:oystercard) }
 
 
-
-    # before do
-    #   oystercard.touch_out(station)
-    # end
   describe "#initialize" do
     it "logs entry station with a new journey" do
       expect(journey.entry_station).to eq('Stockwell')
@@ -40,9 +36,7 @@ describe Journey do
       journey.end_journey(nil)
       expect(journey.fare).to eq Oystercard::PENALTY
     end
-
   end
-
 
   end
 end

@@ -15,7 +15,7 @@ class Journey
   end
 
   def fare
-    @exit_station.nil? ? Oystercard::PENALTY : Oystercard::DEFAULT_MINIMUM 
+    @exit_station.nil? ? Oystercard::PENALTY : Oystercard::DEFAULT_MINIMUM
   end
 
 end

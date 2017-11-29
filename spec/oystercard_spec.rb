@@ -7,7 +7,7 @@ describe Oystercard do
 
   before do |example|
     unless example.metadata[:skip_before]
-      oystercard.top_up(Oystercard::DEFAULT_MINIMUM)
+      oystercard.top_up(20)
       oystercard.touch_in(station)
     end
   end
@@ -27,7 +27,7 @@ describe Oystercard do
   describe "#top_up" do
 
     it "adds a given amount to the card" do
-      expect{ oystercard.top_up(10) }.to change {oystercard.balance}.by 10
+      expect{ oystercard.top_up(10) }.to change { oystercard.balance }.by 10
     end
 
     it "raises an error if the default limit is reached", :skip_before do
@@ -46,18 +46,17 @@ describe Oystercard do
   describe "#touch_in" do
 
     it "should complete an unfinished journey by setting exit station to nil" do
-      # oystercard.touch_in(station)
+      oystercard.touch_in(station)
       expect(oystercard.exit_station).to eq nil
     end
 
     it "should return entry station and nil in the journeys array" do
-      # oystercard.touch_in(station)
+      oystercard.touch_in(station)
       expect(oystercard.journey_history).to include({:entry_station => station, :exit_station => nil})
     end
 
     it "should charge a penalty fare if the card hasnt been touched out" do
-      oystercard.top_up(10)
-      expect { oystercard.touch_in(station) }.to change {oystercard.balance}.by -Oystercard::PENALTY
+      expect { oystercard.touch_in(station) }.to change { oystercard.balance }.by -Oystercard::PENALTY
     end
 
     it "should be in_journey when touched in" do
@@ -88,8 +87,6 @@ describe Oystercard do
        expect { oystercard.touch_out(station) }.to change{ oystercard.balance }.by(-Oystercard::DEFAULT_MINIMUM)
      end
 
-
-
      it "removes the entry station from the instance variable" do
        expect(oystercard.entry_station).to eq nil
      end
@@ -102,8 +99,5 @@ describe Oystercard do
        expect(oystercard.journey_history).to include({:entry_station => station, :exit_station => station})
      end
   end
-
-
-
 
 end
