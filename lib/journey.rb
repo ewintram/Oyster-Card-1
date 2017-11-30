@@ -1,21 +1,30 @@
 class Journey
 
-  attr_reader :entry_station, :exit_station
+  attr_reader :entry_station, :exit_station, :journey
 
-  def initialize(entry_station)
-    @entry_station = entry_station
+  PENALTY = 6
+  MINIMUM_FARE = 1
 
+  def initialize
+    @journey = {:entry_station => nil, :exit_station => nil}
   end
-  def end_journey(exit_station)
+
+  def start_journey(entry_station)
+    @journey[:entry_station] = entry_station
+    @entry_station = entry_station
+  end
+
+  def end_journey(exit_station = nil)
+    @journey[:exit_station] = exit_station
     @exit_station = exit_station
   end
 
-  def record_journey
-    @journey = {:entry_station => @entry_station, :exit_station => @exit_station}
+  def fare
+    complete? ? MINIMUM_FARE : PENALTY
   end
 
-  def fare
-    @exit_station.nil? ? Oystercard::PENALTY : Oystercard::DEFAULT_MINIMUM
+  def complete?
+    (!!@journey[:entry_station]) && (!!@journey[:exit_station])
   end
 
 end

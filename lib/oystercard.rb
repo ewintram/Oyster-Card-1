@@ -2,16 +2,16 @@ require_relative 'station'
 require_relative 'journey'
 
 class Oystercard
-  attr_reader :balance, :entry_station, :exit_station, :journey_history, :journey
+  attr_reader :balance, :entry_station, :journey_history, :journey
 
   DEFAULT_LIMIT = 90
   DEFAULT_MINIMUM = 1
-  PENALTY = 6
+
 
   def initialize
     @balance = 0
     @journey_history = []
-    @entry_station = nil
+    @journey = Journey.new
   end
 
   def top_up(money)
@@ -19,29 +19,25 @@ class Oystercard
     @balance += money
   end
 
-  def in_journey?
-    !@entry_station.nil?
-  end
-
   def touch_in(entry_station)
     double_touch
     raise "Insufficient balance for journey" if @balance < 1
     @entry_station = entry_station
-    @journey = Journey.new(@entry_station)
+    @journey.start_journey(entry_station)
   end
 
   def touch_out(exit_station)
-    @exit_station = exit_station
-    deduct
+    @journey.end_journey(exit_station)
     update_journey_history
+    deduct
     @entry_station = nil
+    @journey = Journey.new
   end
 
   private
 
   def update_journey_history
-    @journey.end_journey(@exit_station)
-    @journey_history << @journey.record_journey
+    @journey_history << @journey.journey
   end
 
   def deduct
@@ -50,8 +46,9 @@ class Oystercard
 
   def double_touch
     if !@entry_station.nil?
-      update_journey_history
       deduct
+      @journey.end_journey
+      update_journey_history
     end
   end
 end

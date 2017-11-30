@@ -37,18 +37,7 @@ describe Oystercard do
 
   end
 
-  describe "#in_journey?" do
-    it "checks if it is in journey" do
-      expect(oystercard).to be_in_journey
-    end
-  end
-
   describe "#touch_in" do
-
-    it "should complete an unfinished journey by setting exit station to nil" do
-      oystercard.touch_in(station)
-      expect(oystercard.exit_station).to eq nil
-    end
 
     it "should return entry station and nil in the journeys array" do
       oystercard.touch_in(station)
@@ -56,11 +45,7 @@ describe Oystercard do
     end
 
     it "should charge a penalty fare if the card hasnt been touched out" do
-      expect { oystercard.touch_in(station) }.to change { oystercard.balance }.by -Oystercard::PENALTY
-    end
-
-    it "should be in_journey when touched in" do
-      expect(oystercard).to be_in_journey
+      expect { oystercard.touch_in(station) }.to change { oystercard.balance }.by -Journey::PENALTY
     end
 
     it "stores the start station in instance variable" do
@@ -77,27 +62,28 @@ describe Oystercard do
   describe "#touch_out" do
 
     before do
-      oystercard.touch_out(station)
+      oystercard.touch_in(station)
     end
-     it "should not be in_journey when touched out" do
-       expect(oystercard).to_not be_in_journey
-     end
 
      it "deducts a given amount when touched out" do
-       expect { oystercard.touch_out(station) }.to change{ oystercard.balance }.by(-Oystercard::DEFAULT_MINIMUM)
+       expect { oystercard.touch_out(station) }.to change{ oystercard.balance }.by(-Journey::MINIMUM_FARE)
      end
 
      it "removes the entry station from the instance variable" do
-       expect(oystercard.entry_station).to eq nil
+       expect { oystercard.touch_out(station) }.to change{ oystercard.entry_station }.to eq nil
      end
+  end
 
-     it "stores the exit station in an instance variable" do
-       expect(oystercard.exit_station).to eq(station)
-     end
+  describe "#update_journey_history" do
 
-     it "pushes the journey hash into the journeys array" do
-       expect(oystercard.journey_history).to include({:entry_station => station, :exit_station => station})
-     end
+    before do
+      oystercard.touch_in(station)
+      oystercard.touch_out(station)
+    end
+
+    it "pushes the journey hash into the journeys array" do
+      expect(oystercard.journey_history).to include({:entry_station => station, :exit_station => station})
+    end
   end
 
 end
