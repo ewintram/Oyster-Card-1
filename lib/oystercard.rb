@@ -1,12 +1,12 @@
 require_relative 'station'
 require_relative 'journey'
+require_relative 'journey_log'
 
 class Oystercard
   attr_reader :balance, :entry_station, :journey_history, :journey
 
   DEFAULT_LIMIT = 90
   DEFAULT_MINIMUM = 1
-
 
   def initialize
     @balance = 0
@@ -28,16 +28,15 @@ class Oystercard
 
   def touch_out(exit_station)
     @journey.end_journey(exit_station)
-    update_journey_history
     deduct
-    @entry_station = nil
-    @journey = Journey.new
+    update_journey_history
   end
 
   private
 
   def update_journey_history
-    @journey_history << @journey.journey
+    @journey_history << @journey
+    @journey = Journey.new
   end
 
   def deduct
